@@ -9,6 +9,8 @@ namespace Contra
             [SerializeField] private Transform _player;
 
             [Header("Component")]
+            [SerializeField] private Transform _enemy;
+            [SerializeField] private Transform _WayPoint;
             [SerializeField] private BoxCollider2D _boxCollider2D;
             [SerializeField] private SpriteRenderer _spriteRenderer;
 
@@ -34,6 +36,8 @@ namespace Contra
                   if (endPoint != null) endX = endPoint.position.x;
 
                   _player = GameObject.FindGameObjectWithTag("Player").transform;
+
+                  if (_WayPoint != null) _WayPoint.parent = null;
             }
 
             private void Update()
@@ -60,7 +64,7 @@ namespace Contra
                   float step = _moveSpeed * Time.deltaTime;
 
                   // Yalnýzca x ekseni boyunca hareket et
-                  transform.position = new Vector3(Mathf.MoveTowards(transform.position.x, targetX, step), transform.position.y, transform.position.z);
+                  transform.position = new Vector3(Mathf.MoveTowards(transform.position.x, targetX, step), transform.position.y, _enemy.position.z);
 
                   // Flip yap
                   if (transform.position.x > targetX)
@@ -104,11 +108,12 @@ namespace Contra
 
                   var distance = Vector2.Distance(transform.position, _player.position);
 
-                  if (distance > 10) return;
+                  if (distance > 7.5f) return;
 
                   if (Time.time > nextFireTime)
                   {
                         Fire();
+
                         nextFireTime = Time.time + 1f / fireRate;
                   }
             }
@@ -124,5 +129,28 @@ namespace Contra
             }
 
             #endregion
+
+            public void TakeDamage(int damage)
+            {
+                  Debug.Log("Enemy Take Damage");
+
+                  Destroy(gameObject);
+            }
+
+            private void OnTriggerEnter2D(Collider2D collision)
+            {
+                  if (collision.CompareTag("Player"))
+                  {
+                        collision.GetComponent<Player>().TakeDamage(1);
+                  }
+            }
+
+            private void OnCollisionEnter2D(Collision2D collision)
+            {
+                  if (collision.collider.CompareTag("Player"))
+                  {
+                        collision.collider.GetComponent<Player>().TakeDamage(1);
+                  }
+            }
       }
 }
