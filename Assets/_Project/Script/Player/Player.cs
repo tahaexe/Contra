@@ -26,8 +26,10 @@ namespace Contra
             [SerializeField] private bool _isGrounded;
             [SerializeField] private bool _isGoingDown;
             [SerializeField] private bool _isInWater;
+            [SerializeField] private bool _isCrouch;
 
             private Vector2 _lookingDirection;
+
 
             private bool _isDie;
             private float _horizontalMove;
@@ -122,6 +124,11 @@ namespace Contra
                         {
                               _transformAttackPoint.rotation = Quaternion.Euler(0, 0, 0);
                         }
+
+                        if (!isMoving)
+                        {
+                              _transformAttackPoint.rotation = Quaternion.Euler(0, 0, 90);
+                        }
                   }
 
                   if (Input.GetKeyUp(KeyCode.UpArrow))
@@ -134,9 +141,22 @@ namespace Contra
                   // Down Arrow
                   if (Input.GetKey(KeyCode.DownArrow) && isGrounded)
                   {
-                        _boxCollider2D.isTrigger = true;
                         _animator.SetBool(_crouchAnimation, !isMoving);
                         _animator.SetBool(_downAnimation, isMoving);
+
+                        if (!isMoving && isGrounded)
+                        {
+                              _isCrouch = true;
+
+                              if (_rigidbody2D.velocity.x > 0)
+                              {
+                                    _transformAttackPoint.rotation = Quaternion.Euler(0, 0, 0);
+                              }
+                              else if (_rigidbody2D.velocity.x < 0)
+                              {
+                                    _transformAttackPoint.rotation = Quaternion.Euler(0, 0, 180);
+                              }
+                        }
 
                         if (isMoving && _lookingDirection == Vector2.right)
                         {
@@ -154,7 +174,7 @@ namespace Contra
 
                   if (Input.GetKeyUp(KeyCode.DownArrow))
                   {
-                        _boxCollider2D.isTrigger = false;
+                        _isCrouch = false;
                         _animator.SetBool(_crouchAnimation, false);
                         _animator.SetBool(_downAnimation, false);
                         _transformAttackPoint.rotation = Quaternion.Euler(0, 0, 0);
@@ -163,9 +183,9 @@ namespace Contra
                   // Attack (Z)
                   if (Input.GetKey(KeyCode.Z) && isGrounded)
                   {
-                        Attack();
+                        _animator.SetBool(_attackAnimation, true);
 
-                        _animator.SetBool(_attackAnimation, true);                        
+                        Attack();
                   }
 
                   if (Input.GetKeyUp(KeyCode.Z))
@@ -225,6 +245,8 @@ namespace Contra
 
             private void Attack()
             {
+                  if (_isCrouch) return;
+
                   if (Time.time >= nextFireTime)
                   {
                         nextFireTime = Time.time + 0.2f;
@@ -273,6 +295,8 @@ namespace Contra
 
             private void Die()
             {
+                  if (_isCrouch) return;
+
                   if (_isDie) return;
                   _isDie = true;
 
