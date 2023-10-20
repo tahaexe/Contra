@@ -35,9 +35,23 @@ namespace Contra
 
             private void OnTriggerEnter2D(Collider2D collision)
             {
-                  if (collision.CompareTag("Player"))
+                  Debug.Log("AAA " + collision.tag);
+
+                  if (collision.CompareTag("Enemy"))
                   {
-                        collision.GetComponent<Player>().TakeDamage(1);
+                        collision.GetComponent<EnemyController>().TakeDamage(1);
+
+                        Destroy(gameObject);
+                  }
+            }
+
+            private void OnCollisionEnter2D(Collision2D collision)
+            {
+                  Debug.Log("BBB " + collision.transform.tag);
+
+                  if (collision.collider.CompareTag("Enemy"))
+                  {
+                        collision.collider.GetComponent<EnemyController>().TakeDamage(1);
 
                         Destroy(gameObject);
                   }
