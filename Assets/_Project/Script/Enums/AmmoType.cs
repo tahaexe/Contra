@@ -7,6 +7,6 @@ namespace Contra
             F,
             S,
             R,
-            B
+            L
       }
 }
