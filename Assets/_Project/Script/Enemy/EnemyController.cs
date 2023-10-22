@@ -13,6 +13,7 @@ namespace Contra
             [SerializeField] private Transform _WayPoint;
             [SerializeField] private BoxCollider2D _boxCollider2D;
             [SerializeField] private SpriteRenderer _spriteRenderer;
+            [SerializeField] private Animator _animator;
 
             [Header("Path")]
             [SerializeField] private Transform startPoint;
@@ -23,15 +24,17 @@ namespace Contra
             [SerializeField] private GameObject bulletPrefab;
             [SerializeField] private Transform firePoint;
             [SerializeField] private float fireRate = 3f;
+
+            private bool _isDead = false;
             private float nextFireTime = 0f;
-
             private bool movingToEnd = true;
-
             private float startX;
             private float endX;
 
-            void Start()
+            private void Start()
             {
+                  _isDead = false;
+
                   if (startPoint != null) startX = startPoint.position.x;
                   if (endPoint != null) endX = endPoint.position.x;
 
@@ -42,6 +45,8 @@ namespace Contra
 
             private void Update()
             {
+                  if (_isDead) return;
+
                   switch (_enemyType)
                   {
                         case EnemyType.Runner:
@@ -62,6 +67,8 @@ namespace Contra
             {
                   float targetX = movingToEnd ? endX : startX;
                   float step = _moveSpeed * Time.deltaTime;
+
+                  _animator?.SetBool("Run", true);
 
                   // Yalnýzca x ekseni boyunca hareket et
                   transform.position = new Vector3(Mathf.MoveTowards(transform.position.x, targetX, step), transform.position.y, _enemy.position.z);
@@ -86,15 +93,21 @@ namespace Contra
             {
                   if (_player.position.y > transform.position.y + 2f)
                   {
-                        _spriteRenderer.sprite = characterSprites[0];
+                        _animator.SetBool("Down", false);
+                        _animator.SetBool("Up", true);
+                        _animator.SetBool("Forward", false);
                   }
                   else if (_player.position.y > transform.position.y - 2f)
                   {
-                        _spriteRenderer.sprite = characterSprites[1];
+                        _animator.SetBool("Down", false);
+                        _animator.SetBool("Up", false);
+                        _animator.SetBool("Forward", true);
                   }
                   else
                   {
-                        _spriteRenderer.sprite = characterSprites[2];
+                        _animator.SetBool("Down", true);
+                        _animator.SetBool("Up", false);
+                        _animator.SetBool("Forward", false);
                   }
 
                   if (transform.position.x > _player.position.x)
@@ -120,6 +133,8 @@ namespace Contra
 
             void Fire()
             {
+                  AudioManager.Instance.Play(AudioName.SFX_Weapon_M);
+
                   Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
             }
 
@@ -132,9 +147,22 @@ namespace Contra
 
             public void TakeDamage(int damage)
             {
-                  Debug.Log("Enemy Take Damage");
+                  if (_isDead) return;
+                  _isDead = true;
+                  _boxCollider2D.enabled = false;
 
-                  Destroy(gameObject);
+                  AudioManager.Instance.Play(AudioName.SFX_EnemyDie);
+
+                  if (_animator != null)
+                  {
+                        _animator.SetBool("Down", false);
+                        _animator.SetBool("Up", false);
+                        _animator.SetBool("Forward", false);
+                        _animator.SetBool("Run", false);
+                        _animator.SetBool("Die", true);
+                  }
+
+                  Destroy(gameObject, 0.48f);
             }
 
             private void OnTriggerEnter2D(Collider2D collision)
