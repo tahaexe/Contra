@@ -8,6 +8,8 @@ TagManager:
   - WaterZone
   - DeathZone
   - Enemy
+  - Ammo
+  - Boss
   layers:
   - Default
   - TransparentFX
