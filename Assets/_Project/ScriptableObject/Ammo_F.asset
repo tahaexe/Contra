@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   AmmoType: 1
   AmmoPrefab: {fileID: 0}
+  SoundName: 8
+  AmmoSpeed: 2

@@ -22,11 +22,14 @@ namespace Contra
             [SerializeField] private Transform _groundCheck;
             [SerializeField] private BoxCollider2D _boxCollider2D;
             [SerializeField] private Transform _transformAttackPoint;
+            [SerializeField] private AudioSource _audioSource;
 
             [SerializeField] private bool _isGrounded;
             [SerializeField] private bool _isGoingDown;
             [SerializeField] private bool _isInWater;
             [SerializeField] private bool _isCrouch;
+
+
 
             private Vector2 _lookingDirection;
 
@@ -249,7 +252,9 @@ namespace Contra
 
                   if (Time.time >= nextFireTime)
                   {
-                        nextFireTime = Time.time + 0.2f;
+                        nextFireTime = Time.time + 1f / _ammo.AmmoSpeed;
+
+                        AudioManager.Instance.Play(_ammo.SoundName);                        
 
                         Instantiate(_ammo.AmmoPrefab, _transformAttackPoint.position, _transformAttackPoint.rotation);
                   }
@@ -305,6 +310,10 @@ namespace Contra
                   Debug.Log("Die");
 
                   _rigidbody2D.velocity = Vector2.zero;
+
+                  EventManager.OnPlayerDead();                  
+
+                  AudioManager.Instance.Play(AudioName.SFX_PlayerDie);
             }
 
             public void SetDeadline(float minX, float maxX, float minY, float maxY)
@@ -323,6 +332,11 @@ namespace Contra
                   {
                         Die();
                   }
+            }
+
+            public void AddAmmo(Ammo ammo)
+            {
+                  _ammo = ammo;
             }
 
             private void OnTriggerEnter2D(Collider2D collision)

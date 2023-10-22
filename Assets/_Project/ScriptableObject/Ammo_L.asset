@@ -10,7 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fd55557bd74165f48a7733954eac2821, type: 3}
-  m_Name: Ammo_B
+  m_Name: Ammo_L
   m_EditorClassIdentifier: 
   AmmoType: 4
   AmmoPrefab: {fileID: 0}
+  SoundName: 8
+  AmmoSpeed: 2

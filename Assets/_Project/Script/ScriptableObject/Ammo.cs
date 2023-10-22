@@ -7,6 +7,7 @@ namespace Contra
       {
             public AmmoType AmmoType;
             public Transform AmmoPrefab;
+            public AudioName SoundName;
             public float AmmoSpeed;
       }
 }
